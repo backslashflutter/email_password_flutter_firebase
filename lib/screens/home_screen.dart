@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:email_password_login/imageupload/image_retrive.dart';
+import 'package:email_password_login/imageupload/image_upload.dart';
 import 'package:email_password_login/model/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -32,10 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Welcome"),
-        centerTitle: true,
-      ),
+      appBar: _appBar(),
       body: Center(
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -67,11 +66,27 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 height: 15,
               ),
-              ActionChip(
-                  label: Text("Logout"),
-                  onPressed: () {
-                    logout(context);
-                  }),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ImageUpload(
+                                userId: loggedInUser.uid,
+                              )));
+                },
+                child: const Text("Upload Image"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ImageRetrive(userId: loggedInUser.uid)));
+                },
+                child: const Text("Show Uploads"),
+              ),
             ],
           ),
         ),
@@ -79,6 +94,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  _appBar() {
+    final appBarHeight = AppBar().preferredSize.height;
+    return PreferredSize(
+        preferredSize: Size.fromHeight(appBarHeight),
+        child: AppBar(title: const Text("Profile"), actions: [
+          IconButton(
+              onPressed: () {
+                logout(context);
+              },
+              icon: const Icon(Icons.logout)),
+        ]));
+  }
+
+  // the logout function
   Future<void> logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     Navigator.of(context).pushReplacement(
